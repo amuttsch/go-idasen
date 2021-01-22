@@ -11,7 +11,7 @@ ikea.
 The position of the desk can controlled by a physical switch on the desk or
 via bluetooth using an phone app.
 
-This is a command line interface written in Go to control the Idasen via
+This is a command line interface and API written in Go to control the Idasen via
 bluetooth from a desktop computer.
 
 ## Set Up
@@ -38,10 +38,10 @@ go-idasen init
 
 
 ```yaml
-    mac_address: AA:AA:AA:AA:AA:AA
-    positions:
-        sit: 0.75
-        stand: 1.1
+mac_address: AA:AA:AA:AA:AA:AA
+positions:
+    sit: 0.75
+    stand: 1.1
 ```
 
 Configuration options:
