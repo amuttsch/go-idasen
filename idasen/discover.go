@@ -61,10 +61,19 @@ func DiscoverDesk() (*desk, error) {
 			log.Debugf("name=%s addr=%s rssi=%d\n", dev.Properties.Name, dev.Properties.Address, dev.Properties.RSSI)
 
 			if deskNameRegex.MatchString(dev.Properties.Name) {
-				dev.Pair()
+				err = dev.Pair()
+				if err != nil {
+					log.Errorf("Pairing failed: %s", err)
+					return
+				}
+
 				log.Debugf("Paired device %s", dev.Properties.Name)
 
-				dev.SetTrusted(true)
+				err = dev.SetTrusted(true)
+				if err != nil {
+					log.Errorf("Trusting failed: %s", err)
+					return
+				}
 				log.Debugf("Trusting device %s", dev.Properties.Name)
 
 				deskChan <- &desk{

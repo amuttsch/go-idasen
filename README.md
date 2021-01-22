@@ -2,7 +2,7 @@
 
 ![Go](https://github.com/amuttsch/go-idasen/workflows/Go/badge.svg)
 
-This is a Go adaptation of [newAM/idasen](https://github.com/newAM/idasen) which has the same
+This is a Go adaptation of [newAM/idasen](https://github.com/newAM/idasen) which has a similar
 command line interface and configuration file format.
 
 The IDÅSEN is an electric sitting standing desk with a Linak controller sold by
@@ -76,6 +76,10 @@ To delete the saved sitting position:
 
     $ go-idasen delete sit
 
+To move the desk to a specific height:
+
+    $ go-idasen move 0.8
+
 Assuming the config file is populated to move the desk to sitting position:
 
     $ go-idasen sit
@@ -88,7 +92,7 @@ Import `go-idasen` in your application:
 
     import "github.com/amuttsch/go-idasen/idasen"
 
-Execpt for desk discovery you should always defer `idasen.Close()` to clean up and disconnect the bluetooth connection.
+Except for desk discovery you should always defer `idasen.Close()` to clean up and disconnect the bluetooth connection.
 
 #### Discover a desk
 

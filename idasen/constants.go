@@ -11,7 +11,6 @@ var (
 
 	_UUID_HEIGHT = "99fa0021-338a-1024-8a49-009c0215f78a"
 	_UUID_COMMAND = "99fa0002-338a-1024-8a49-009c0215f78a"
-	_UUID_REFERENCE_INPUT = "99fa0031-338a-1024-8a49-009c0215f78a"
 
     _COMMAND_REFERENCE_INPUT_STOP = []byte{0x01, 0x80}
 	_COMMAND_UP = []byte{0x47, 0x00}
@@ -25,7 +24,7 @@ func getOptions() map[string]interface{} {
 }
 
 func heightBytesToMeter(b []byte) float64 {
-	if (len(b) < 2) {
+	if len(b) < 2 {
 		return -1
 	}
 
