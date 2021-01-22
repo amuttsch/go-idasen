@@ -23,14 +23,20 @@ func (i *Idasen) MoveDown() error {
 }
 
 func (i *Idasen) MoveStop() error {
-	char, err := i.device.GetCharByUUID(_UUID_COMMAND)
+	char_cmd, err := i.device.GetCharByUUID(_UUID_COMMAND)
 	if err != nil {
 		log.Errorf("Cannot get command char %s", err)
 		return err
 	}
+	
+	char_ref, err := i.device.GetCharByUUID(_UUID_REFERENCE_INPUT)
+	if err != nil {
+		log.Errorf("Cannot get reference input char %s", err)
+		return err
+	}
 
-	_ = char.WriteValue(_COMMAND_STOP, getOptions())
-	return char.WriteValue(_COMMAND_REFERENCE_INPUT_STOP, getOptions())
+	_ = char_cmd.WriteValue(_COMMAND_STOP, getOptions())
+	return char_ref.WriteValue(_COMMAND_REFERENCE_INPUT_STOP, getOptions())
 }
 
 func (i *Idasen) MoveToTarget(targetInMeters float64) error {
