@@ -33,7 +33,7 @@ YAML configuration file located at ``~/.config/idasen/idasen.yaml``.
 You can use this command to initialize a new configuartion file:
 
 ```shell
-go-idasen init
+$ go-idasen init
 ```
 
 
@@ -62,23 +62,23 @@ adapter names can be found with ``hcitool dev`` on linux.
 
 To print the current desk height:
 
-    go-idasen height
+    $ go-idasen height
 
 To monitor for changes to height:
 
-    go-idasen monitor
+    $ go-idasen monitor
 
 To save the current height as the sitting position:
 
-    go-idasen save sit
+    $ go-idasen save sit
 
 To delete the saved sitting position:
 
-    go-idasen delete sit
+    $ go-idasen delete sit
 
 Assuming the config file is populated to move the desk to sitting position:
 
-    idasen sit
+    $ go-idasen sit
 
 ### API
 
@@ -96,7 +96,7 @@ To discover a desk:
 
     desk, err := idasen.DiscoverDesk()
 
-It returns a `desk` struct containing the name and mac address of the desk or an error if no desk was found
+It returns a `desk` struct containing the name and mac address of the desk or an error if no desk was found.
 
 #### Current height
 
