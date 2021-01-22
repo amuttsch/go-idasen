@@ -2,7 +2,7 @@
 
 ![Go](https://github.com/amuttsch/go-idasen/workflows/Go/badge.svg)
 
-This is a Go adaptation of (newAM/idasen)[https://github.com/newAM/idasen] which has the same
+This is a Go adaptation of [newAM/idasen](https://github.com/newAM/idasen) which has the same
 command line interface and configuration file format.
 
 The IDÅSEN is an electric sitting standing desk with a Linak controller sold by
