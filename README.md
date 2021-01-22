@@ -1,4 +1,6 @@
-# idasen
+# go-idasen
+
+![Go](https://github.com/amuttsch/go-idasen/workflows/Go/badge.svg)
 
 This is a Go adaptation of (newAM/idasen)[https://github.com/newAM/idasen] which has the same
 command line interface and configuration file format.
