@@ -47,14 +47,16 @@ func New(config Configuration) (*Idasen, error) {
 
 	log.Debugf("Connected to desk %s", config.MacAddress)
 
-	err = d.Pair()
-	if err != nil {
-		log.Errorf("Cannot connect to device %s: %s", config.MacAddress, err)
-		api.Exit()
-		return nil, err
-	}
+	if !d.Properties.Paired {
+		err = d.Pair()
+		if err != nil {
+			log.Errorf("Cannot connect to device %s: %s", config.MacAddress, err)
+			api.Exit()
+			return nil, err
+		}
 
-	log.Debugf("Paired with desk %s", config.MacAddress)
+		log.Debugf("Paired with desk %s", config.MacAddress)
+	}
 
 	return &Idasen{
 		device: d,
