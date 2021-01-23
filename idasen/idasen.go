@@ -68,6 +68,10 @@ func (i *Idasen) Close() {
 	defer i.device.Disconnect()
 }
 
+func  (i *Idasen) Disconnect() {
+	i.device.Disconnect()
+}
+
 func SetDebug() {
 	log.SetLevel(logrus.DebugLevel)
 }
