@@ -2,6 +2,8 @@ package idasen
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
 )
 
 func (i *Idasen) MoveUp() error {
@@ -54,6 +56,10 @@ func (i *Idasen) MoveToTarget(targetInMeters float64) error {
 	}
 
 	willMoveUp := previousHeight < targetInMeters
+	stallingCount := 0
+
+	exitCh := make(chan os.Signal, 1)
+	signal.Notify(exitCh, os.Interrupt, os.Kill)
 
 	log.Debugf("Will move to target %.4f\n", targetInMeters)
 
@@ -62,12 +68,30 @@ func (i *Idasen) MoveToTarget(targetInMeters float64) error {
 		if err != nil {
 			return err
 		}
-		
+
+		select {
+		case <-exitCh:
+			return fmt.Errorf("signal interrupt")
+		case i.HeightCh <- height:
+		default:
+		}
+
 		// Check if the safety stop was triggered
 		if (height > previousHeight && !willMoveUp) || (height < previousHeight && willMoveUp) {
 			_ = i.MoveStop()
 			return fmt.Errorf("safety stop was trigged")
-		} 
+		}
+
+		// Check if the desk stalls
+		if height == previousHeight {
+			stallingCount = stallingCount + 1
+			if stallingCount > 5 {
+				i.MoveStop()
+				return fmt.Errorf("Desk not moving anymore, exiting")
+			}
+		} else {
+			stallingCount = 0
+		}
 
 		difference := 0.0
 		if willMoveUp {

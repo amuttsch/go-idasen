@@ -47,7 +47,7 @@ var monitorCmd = &cobra.Command{
 		var wg sync.WaitGroup
 		wg.Add(1)
 
-		ch := make(chan os.Signal,1 )
+		ch := make(chan os.Signal, 1)
 		signal.Notify(ch, os.Interrupt, os.Kill)
 
 		go func() {

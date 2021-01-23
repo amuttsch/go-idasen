@@ -48,6 +48,14 @@ var rootCmd = &cobra.Command{
 		}
 		defer idasen.Close()
 
+		go func() {
+			for h := range idasen.HeightCh {
+				fmt.Printf("\rHeight: %.4f", h)
+			}
+
+			fmt.Println()
+		}()
+
 		err = idasen.MoveToTarget(targetHeight)
 		if err != nil {
 			fmt.Println(err)

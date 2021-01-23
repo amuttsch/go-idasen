@@ -13,5 +13,12 @@ func (i *Idasen) HeightInMeters() (float64, error) {
 		return 0, err
 	}
 
-	return heightBytesToMeter(raw), nil
+	meters := heightBytesToMeter(raw)
+
+	select {
+	case i.HeightCh <- meters:
+	default:
+	}
+
+	return meters, nil
 }

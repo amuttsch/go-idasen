@@ -1,6 +1,7 @@
 package idasen
 
 import (
+	"fmt"
 	"github.com/muka/go-bluetooth/api"
 	"github.com/muka/go-bluetooth/bluez/profile/adapter"
 	"github.com/muka/go-bluetooth/bluez/profile/device"
@@ -11,6 +12,7 @@ var log = logrus.New()
 
 type Idasen struct {
 	device *device.Device1
+	HeightCh chan float64
 }
 
 type Configuration struct {
@@ -38,6 +40,10 @@ func New(config Configuration) (*Idasen, error) {
 		return nil, err
 	}
 
+	if d.Properties.Connected {
+		return nil, fmt.Errorf("Device already connected, cannot use go-idasen concurrently!")
+	}
+
 	err = d.Connect()
 	if err != nil {
 		log.Errorf("Cannot connect to device %s: %s", config.MacAddress, err)
@@ -60,17 +66,19 @@ func New(config Configuration) (*Idasen, error) {
 
 	return &Idasen{
 		device: d,
+		HeightCh: make(chan float64),
 	}, nil
 }
 
 func (i *Idasen) Close() {
 	defer api.Exit()
-	defer i.device.Disconnect()
+	defer i.Disconnect()
 
 	log.Debugln("Closing connection and exit api.")
 }
 
 func  (i *Idasen) Disconnect() {
+	close(i.HeightCh)
 	err := i.device.Disconnect()
 
 	log.Debugf("Disconnected. Error: %s", err)
