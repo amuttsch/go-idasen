@@ -66,10 +66,14 @@ func New(config Configuration) (*Idasen, error) {
 func (i *Idasen) Close() {
 	defer api.Exit()
 	defer i.device.Disconnect()
+
+	log.Debugln("Closing connection and exit api.")
 }
 
 func  (i *Idasen) Disconnect() {
-	i.device.Disconnect()
+	err := i.device.Disconnect()
+
+	log.Debugf("Disconnected. Error: %s", err)
 }
 
 func SetDebug() {

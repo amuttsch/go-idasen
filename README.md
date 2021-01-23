@@ -92,7 +92,7 @@ Import `go-idasen` in your application:
 
     import "github.com/amuttsch/go-idasen/idasen"
 
-Except for desk discovery you should always defer `idasen.Close()` to clean up and disconnect the bluetooth connection.
+Except for desk discovery you should always defer `idasen.Close()` to clean up and disconnect the bluetooth connection. If you don't exit your program and want to establish a new connection (e.g. in a server context), use `idasen.Disonnect()` instead.
 
 #### Discover a desk
 
