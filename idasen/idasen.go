@@ -64,6 +64,14 @@ func New(config Configuration) (*Idasen, error) {
 		log.Debugf("Paired with desk %s", config.MacAddress)
 	}
 
+	uuids, err := d.GetUUIDs()
+	if err != nil {
+		log.Errorf("Cannot detect uuids: %s", err)
+		api.Exit()
+		return nil, err
+	}
+	log.Trace("uuids: %v, err: %s\n", uuids, err)
+
 	return &Idasen{
 		device: d,
 		HeightCh: make(chan float64),
