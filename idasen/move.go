@@ -39,6 +39,10 @@ func (i *Idasen) MoveStop() error {
 }
 
 func (i *Idasen) MoveToTarget(targetInMeters float64) error {
+	return i.MoveToTargetWithUpdateChannel(targetInMeters, nil)
+}
+
+func (i *Idasen) MoveToTargetWithUpdateChannel(targetInMeters float64, updateCh chan float64) error {
 	if targetInMeters > _MAX_HEIGHT {
 		return fmt.Errorf("target heigth %.4fm exceeds maximum height of %.2fm", targetInMeters, _MAX_HEIGHT)
 	}
@@ -60,6 +64,10 @@ func (i *Idasen) MoveToTarget(targetInMeters float64) error {
 		height, err := i.HeightInMeters()
 		if err != nil {
 			return err
+		}
+
+		if updateCh != nil {
+			updateCh <- height
 		}
 
 		// Check if the safety stop was triggered

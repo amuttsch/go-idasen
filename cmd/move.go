@@ -18,7 +18,7 @@ var moveCmd = &cobra.Command{
 	Use:   "move",
 	Short: "Move desk to target height",
 	Long:  `Move desk to target height, usage: move 0.7`,
-	Args: cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		configFile := getConfigFilePath()
 		if _, err := os.Stat(configFile); os.IsNotExist(err) {
