@@ -3,35 +3,35 @@ package idasen
 import (
 	"errors"
 	"fmt"
-	"github.com/muka/go-bluetooth/api"
-	"github.com/muka/go-bluetooth/bluez/profile/adapter"
-	"github.com/muka/go-bluetooth/bluez/profile/device"
 	"os"
 	"os/signal"
 	"regexp"
 	"time"
+	"tinygo.org/x/bluetooth"
 )
 
 const _DISCOVER_TIMEOUT = 5 * time.Second
 
 func DiscoverDesk() (*desk, error) {
-	//clean up connection on exit
-	defer api.Exit()
-
-	a, err := adapter.GetDefaultAdapter()
+	result, err := getDesk("")
 	if err != nil {
 		return nil, err
 	}
 
+	return &desk{
+		Name:    result.LocalName(),
+		Address: result.Address.String(),
+	}, nil
+}
+
+func getDesk(mac string) (*bluetooth.ScanResult, error) {
 	log.Debug("Start discovery")
-	discovery, cancel, err := api.Discover(a, nil)
+	err := adapter.Enable()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("must enable adapter: %w", err)
 	}
-	defer cancel()
 
-	discoverTimeout := time.NewTimer(_DISCOVER_TIMEOUT)
-	deskChan := make(chan *desk)
+	resultCh := make(chan bluetooth.ScanResult, 1)
 
 	deskNameRegex, err := regexp.Compile("Desk \\d+")
 	if err != nil {
@@ -39,62 +39,31 @@ func DiscoverDesk() (*desk, error) {
 		return nil, errors.New("invalid regex")
 	}
 
-	go func() {
-
-		for ev := range discovery {
-
-			if ev.Type == adapter.DeviceRemoved {
-				continue
+	// Start scanning.
+	log.Debugln("Scanning...")
+	err = adapter.Scan(func(adapter *bluetooth.Adapter, result bluetooth.ScanResult) {
+		if mac == "" {
+			if deskNameRegex.MatchString(result.LocalName()) {
+				log.Infoln("Found Desk:", result.Address.String(), result.RSSI, result.LocalName())
+				adapter.StopScan()
+				resultCh <- result
 			}
-
-			dev, err := device.NewDevice1(ev.Path)
-			if err != nil {
-				log.Errorf("%s: %s", ev.Path, err)
-				continue
-			}
-
-			if dev == nil {
-				log.Errorf("%s: not found", ev.Path)
-				continue
-			}
-
-			log.Debugf("name=%s addr=%s rssi=%d\n", dev.Properties.Name, dev.Properties.Address, dev.Properties.RSSI)
-
-			if deskNameRegex.MatchString(dev.Properties.Name) {
-				if !dev.Properties.Paired {
-					err = dev.Pair()
-					if err != nil {
-						log.Errorf("Pairing failed: %s", err)
-						return
-					}
-
-					log.Debugf("Paired device %s", dev.Properties.Name)
-				}
-
-				err = dev.SetTrusted(true)
-				if err != nil {
-					log.Errorf("Trusting failed: %s", err)
-					return
-				}
-				log.Debugf("Trusting device %s", dev.Properties.Name)
-
-				deskChan <- &desk{
-					Name:    dev.Properties.Name,
-					Address: dev.Properties.Address,
-				}
-
-				return
+		} else {
+			if result.Address.String() == mac {
+				adapter.StopScan()
+				resultCh <- result
 			}
 		}
 
-	}()
+	})
 
+	discoverTimeout := time.NewTimer(_DISCOVER_TIMEOUT)
 	ch := make(chan os.Signal)
 	signal.Notify(ch, os.Interrupt, os.Kill)
 
 	select {
-	case desk := <-deskChan:
-		return desk, nil
+	case result := <-resultCh:
+		return &result, nil
 	case <-discoverTimeout.C:
 		e := fmt.Errorf("Discover timeout reached after %s", _DISCOVER_TIMEOUT.String())
 		log.Debugln(e)

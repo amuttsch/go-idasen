@@ -28,7 +28,7 @@ $ go get -u github.com/amuttsch/go-idasen
 
 ## Configuration
 Configuration that is not expected to change frequency can be provided via a
-YAML configuration file located at ``~/.config/idasen/idasen.yaml``.
+YAML configuration file located at ``./idasen.yaml``.
 
 You can use this command to initialize a new configuartion file:
 

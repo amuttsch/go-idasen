@@ -1,42 +1,41 @@
 package idasen
 
-import (
-	"fmt"
-)
+import "fmt"
 
 func (i *Idasen) MoveUp() error {
-	char, err := i.device.GetCharByUUID(_UUID_COMMAND)
+	_, err := i.writeValue(_UUID_COMMAND, _COMMAND_UP)
 	if err != nil {
-		log.Errorf("Cannot get command char %s", err)
+		log.Errorf("Cannot move desk: %s", err)
 		return err
 	}
-	return char.WriteValue(_COMMAND_UP, getOptions())
+
+	return nil
 }
 
 func (i *Idasen) MoveDown() error {
-	char, err := i.device.GetCharByUUID(_UUID_COMMAND)
+	_, err := i.writeValue(_UUID_COMMAND, _COMMAND_DOWN)
 	if err != nil {
-		log.Errorf("Cannot get command char %s", err)
+		log.Errorf("Cannot move desk: %s", err)
 		return err
 	}
-	return char.WriteValue(_COMMAND_DOWN, getOptions())
+
+	return nil
 }
 
 func (i *Idasen) MoveStop() error {
-	char_cmd, err := i.device.GetCharByUUID(_UUID_COMMAND)
+	_, err := i.writeValue(_UUID_COMMAND, _COMMAND_STOP)
 	if err != nil {
-		log.Errorf("Cannot get command char %s", err)
-		return err
-	}
-	
-	char_ref, err := i.device.GetCharByUUID(_UUID_REFERENCE_INPUT)
-	if err != nil {
-		log.Errorf("Cannot get reference input char %s", err)
+		log.Errorf("Cannot stop desk: %s", err)
 		return err
 	}
 
-	_ = char_cmd.WriteValue(_COMMAND_STOP, getOptions())
-	return char_ref.WriteValue(_COMMAND_REFERENCE_INPUT_STOP, getOptions())
+	_, err = i.writeValue(_UUID_REFERENCE_INPUT, _COMMAND_STOP)
+	if err != nil {
+		log.Errorf("Cannot stop desk: %s", err)
+		return err
+	}
+
+	return nil
 }
 
 func (i *Idasen) MoveToTarget(targetInMeters float64) error {
@@ -62,12 +61,12 @@ func (i *Idasen) MoveToTarget(targetInMeters float64) error {
 		if err != nil {
 			return err
 		}
-		
+
 		// Check if the safety stop was triggered
 		if (height > previousHeight && !willMoveUp) || (height < previousHeight && willMoveUp) {
 			_ = i.MoveStop()
 			return fmt.Errorf("safety stop was trigged")
-		} 
+		}
 
 		difference := 0.0
 		if willMoveUp {
@@ -91,7 +90,7 @@ func (i *Idasen) MoveToTarget(targetInMeters float64) error {
 		if err != nil {
 			return err
 		}
-		
+
 		previousHeight = height
 	}
 

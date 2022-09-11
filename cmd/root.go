@@ -70,9 +70,7 @@ func init() {
 }
 
 func getConfigFilePath() string {
-	path, _ := os.UserConfigDir()
-
-	return path  + "/idasen/idasen.yaml"
+	return "./idasen.yaml"
 }
 
 func initConfig() {
