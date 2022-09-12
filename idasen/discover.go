@@ -10,10 +10,8 @@ import (
 	"tinygo.org/x/bluetooth"
 )
 
-const _DISCOVER_TIMEOUT = 5 * time.Second
-
-func DiscoverDesk() (*desk, error) {
-	result, err := getDesk("")
+func DiscoverDesk(timeout int64) (*desk, error) {
+	result, err := getDesk("", timeout)
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +22,7 @@ func DiscoverDesk() (*desk, error) {
 	}, nil
 }
 
-func getDesk(mac string) (*bluetooth.ScanResult, error) {
+func getDesk(mac string, timeout int64) (*bluetooth.ScanResult, error) {
 	log.Debug("Start discovery")
 	err := adapter.Enable()
 	if err != nil {
@@ -57,7 +55,7 @@ func getDesk(mac string) (*bluetooth.ScanResult, error) {
 
 	})
 
-	discoverTimeout := time.NewTimer(_DISCOVER_TIMEOUT)
+	discoverTimeout := time.NewTimer(time.Duration(timeout) * time.Second)
 	ch := make(chan os.Signal)
 	signal.Notify(ch, os.Interrupt, os.Kill)
 
@@ -65,7 +63,7 @@ func getDesk(mac string) (*bluetooth.ScanResult, error) {
 	case result := <-resultCh:
 		return &result, nil
 	case <-discoverTimeout.C:
-		e := fmt.Errorf("Discover timeout reached after %s", _DISCOVER_TIMEOUT.String())
+		e := fmt.Errorf("Discover timeout reached after %d seconds", timeout)
 		log.Debugln(e)
 		return nil, e
 	case sig := <-ch:

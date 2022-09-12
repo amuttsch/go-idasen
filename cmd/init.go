@@ -11,6 +11,8 @@ import (
 
 var forceInit bool
 
+var _DEFAULT_TIMEOUT = 10
+
 func init() {
 	rootCmd.AddCommand(initCmd)
 
@@ -32,7 +34,7 @@ var initCmd = &cobra.Command{
 			idasen.SetDebug()
 		}
 
-		desk, err := idasen.DiscoverDesk()
+		desk, err := idasen.DiscoverDesk(int64(_DEFAULT_TIMEOUT))
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -44,9 +46,11 @@ var initCmd = &cobra.Command{
 				"sit": 0.75,
 				"stand": 1.11,
 			},
+            Timeout: int64(_DEFAULT_TIMEOUT),
 		}
 		viper.Set("mac_address", config.MacAddress)
 		viper.Set("positions", config.Positions)
+		viper.Set("timeout", config.Timeout)
 
 		_ = viper.WriteConfigAs(configFile)
 		fmt.Printf("Written configuration to %s\n", configFile)

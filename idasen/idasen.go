@@ -14,6 +14,7 @@ type Idasen struct {
 type Configuration struct {
 	MacAddress string             `mapstructure:"mac_address"`
 	Positions  map[string]float64 `mapstructure:"positions"`
+    Timeout    int64              `mapstructure:"timeout"`
 }
 
 type desk struct {
@@ -22,7 +23,7 @@ type desk struct {
 }
 
 func New(config Configuration) (*Idasen, error) {
-	desk, err := getDesk(config.MacAddress)
+	desk, err := getDesk(config.MacAddress, config.Timeout)
 	if err != nil {
 		log.Errorf("Could not find device %s: %s", config.MacAddress, err)
 		return nil, err
